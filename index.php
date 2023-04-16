@@ -9,73 +9,51 @@
 </head>
 <body>
 <?php
-    $servername = "localhost";
-    $username = "root";
-    $password = "";
-    $dbname = "topjugadores";
-    // Crear conexión
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    // Verificar conexión
-    if ($conn->connect_error) {
-        die("Conexión fallida: " . $conn->connect_error);
-    }
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $nombre = $_POST['nombre'];
-        $puntaje = $_POST['puntaje'];
-        $sql = "INSERT INTO puntajes (nombre, puntaje) VALUES ('$nombre', '$puntaje')";
-        if ($conn->query($sql) === TRUE) {
-            echo "Score saved successfully";
-        } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
-        }
-    }
-    // Obtener nombre y puntuación del formulario
-$nombre = $_POST['nombre'];
-$puntaje = $_POST['puntaje'];
-
-// Insertar puntuación en la base de datos
-$sql = "INSERT INTO puntajes (nombre, puntaje) VALUES ('$nombre', '$puntaje')";
-if ($conn->query($sql) === TRUE) {
-    echo "Puntuación guardada con éxito";
-} else {
-    echo "Error al guardar la puntuación: " . $sql . "<br>" . $conn->error;
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "conecta4";
+// Crear conexión
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Verificar conexión
+if ($conn->connect_error) {
+    die("Conexión fallida: " . $conn->connect_error);
 }
-// Si se ha enviado el formulario de puntuación, insertar la puntuación en la base de datos
+// Si se ha enviado el formulario de puntuación, validar e insertar la puntuación en la base de datos
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nombre']) && isset($_POST['puntaje'])) {
-  $nombre = $_POST['nombre'];
-  $puntaje = $_POST['puntaje'];
-  $sql = "INSERT INTO puntajes (nombre, puntaje) VALUES ('$nombre', '$puntaje')";
-  if ($conn->query($sql) === TRUE) {
-      echo "Puntuación guardada con éxito";
-  } else {
-      echo "Error al guardar la puntuación: " . $sql . "<br>" . $conn->error;
-  }
+    // Validar los datos del formulario
+    $nombre = filter_var($_POST['nombre'], FILTER_SANITIZE_STRING);
+    $puntaje = filter_var($_POST['puntaje'], FILTER_VALIDATE_INT);
+    if ($nombre && $puntaje) {
+       // Insertar puntuación en la base de datos
+      $sql = "INSERT INTO jugadores (nombre, puntaje) VALUES ('$nombre', '$puntaje')";
+      if ($conn->query($sql) === TRUE) {
+          echo "Puntuación guardada con éxito";
+      } else {
+          echo "Error al guardar la puntuación: " . $sql . "<br>" . $conn->error;
+      }
+    } else {
+        echo "Datos del formulario no válidos";
+    }
 }
 // Mostrar la tabla de clasificación en formato HTML
-$sql = "SELECT nombre, puntaje FROM puntajes ORDER BY puntaje DESC LIMIT 5";
+$sql = "SELECT nombre, puntaje FROM jugadores ORDER BY puntaje DESC LIMIT 5";
 $result = $conn->query($sql);
-if ($result->num_rows > 0) {
-  echo "<h1>Top 5 Jugadores</h1>";
-  echo "<table id='jugadores'>";
-  echo "<thead><tr><th>Nombre</th><th>Puntuación</th></tr></thead>";
-  echo "<tbody>";
+if ($result && $result->num_rows > 0) {
+  $tabla_clasificacion = "<h1>Top 5 Jugadores</h1>";
+  $tabla_clasificacion .= "<table id='jugadores'>";
+  $tabla_clasificacion .= "<thead><tr><th>Nombre</th><th>Puntuación</th></tr></thead>";
+  $tabla_clasificacion .= "<tbody>";
   while ($row = $result->fetch_assoc()) {
-      echo "<tr><td>" . $row["nombre"] . "</td><td>" . $row["puntaje"] . "</td></tr>";
+      $tabla_clasificacion .= "<tr><td>" . htmlspecialchars($row['nombre']) . "</td><td>" . htmlspecialchars($row['puntaje']) . "</td></tr>";
   }
-  echo "</tbody></table>";
-  echo "<button id='btnTabla'>Mostrar/Ocultar tabla de clasificación</button>";
+  $tabla_clasificacion .= "</tbody></table>";
 } else {
-  echo "No hay datos para mostrar";
+  $tabla_clasificacion = "<p>No hay resultados</p>";
 }
-    // Devolución de los datos en formato JSON
-    $sql = "SELECT nombre, puntaje FROM puntajes ORDER BY puntaje DESC LIMIT 5";
-    $resultado = $conn->query($sql);
-    $datos = array();
-    while ($fila = $resultado->fetch_assoc()) {
-        $datos[] = $fila;
-    }
-    echo json_encode($datos);
 
+// Cerrar conexión a la base de datos
+$conn->close();
 ?>
     <h1>Conecta 4</h1>
     <div id="gameset">
@@ -120,8 +98,7 @@ if ($result->num_rows > 0) {
 <table id="jugadores">
 	<thead>
 		<tr>
-			<th>Nombre</th>
-			<th>Puntuación</th>
+      <?= $tabla_clasificacion ?>
 		</tr>
 	</thead>
 
@@ -349,20 +326,18 @@ btnTabla.addEventListener("click", function() {
         btnTabla.textContent = 'Puntuaciones';
     }
 });
-// Enviar puntuación al servidor
-function sendScore() {
-  var nombre = document.getElementById("player").textContent;
-  var puntaje = parseInt(document.getElementById("jugador" + currentPlayer + "p").textContent);
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      console.log(this.responseText);
-    }
-  };
-  xhttp.open("POST", "guardar_puntuacion.php", true);
-  xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xhttp.send("nombre=" + nombre + "&puntaje=" + puntaje);
-}
-    </script>
+function guardarPuntuacion() {
+  const nombre1 = document.getElementById('player1').value;
+  const nombre2 = document.getElementById('player2').value;
+  const puntuacion1 = player1Wins;
+  const puntuacion2 = player2Wins;
+  $.ajax("index.php", { nombre: nombre1, puntaje: puntuacion1 }, function() {
+    console.log('Puntuación del jugador 1 guardada con éxito');
+  });
+  $.ajax("index.php", { nombre: nombre2, puntaje: puntuacion2 }, function() {
+    console.log('Puntuación del jugador 2 guardada con éxito');
+    location.reload();
+  }); 
+}</script>
 </body>
 </html>
