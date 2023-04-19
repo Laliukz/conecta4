@@ -9,51 +9,20 @@
 </head>
 <body>
 <?php
+// Datos de conexión a la base de datos
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "conecta4";
-// Crear conexión
-$conn = new mysqli($servername, $username, $password, $dbname);
-// Verificar conexión
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
-// Si se ha enviado el formulario de puntuación, validar e insertar la puntuación en la base de datos
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['nombre']) && isset($_POST['puntaje'])) {
-    // Validar los datos del formulario
-    $nombre = filter_var($_POST['nombre'], FILTER_SANITIZE_STRING);
-    $puntaje = filter_var($_POST['puntaje'], FILTER_VALIDATE_INT);
-    if ($nombre && $puntaje) {
-       // Insertar puntuación en la base de datos
-      $sql = "INSERT INTO jugadores (nombre, puntaje) VALUES ('$nombre', '$puntaje')";
-      if ($conn->query($sql) === TRUE) {
-          echo "Puntuación guardada con éxito";
-      } else {
-          echo "Error al guardar la puntuación: " . $sql . "<br>" . $conn->error;
-      }
-    } else {
-        echo "Datos del formulario no válidos";
-    }
-}
-// Mostrar la tabla de clasificación en formato HTML
-$sql = "SELECT nombre, puntaje FROM jugadores ORDER BY puntaje DESC LIMIT 5";
-$result = $conn->query($sql);
-if ($result && $result->num_rows > 0) {
-  $tabla_clasificacion = "<h1>Top 5 Jugadores</h1>";
-  $tabla_clasificacion .= "<table id='jugadores'>";
-  $tabla_clasificacion .= "<thead><tr><th>Nombre</th><th>Puntuación</th></tr></thead>";
-  $tabla_clasificacion .= "<tbody>";
-  while ($row = $result->fetch_assoc()) {
-      $tabla_clasificacion .= "<tr><td>" . htmlspecialchars($row['nombre']) . "</td><td>" . htmlspecialchars($row['puntaje']) . "</td></tr>";
-  }
-  $tabla_clasificacion .= "</tbody></table>";
-} else {
-  $tabla_clasificacion = "<p>No hay resultados</p>";
-}
 
-// Cerrar conexión a la base de datos
-$conn->close();
+// Crear la conexión
+$conn = mysqli_connect($servername, $username, $password, $dbname);
+
+// Verificar la conexión
+if (!$conn) {
+  die("Conexión fallida: " . mysqli_connect_error());
+}
+mysqli_close($conn);
 ?>
     <h1>Conecta 4</h1>
     <div id="gameset">
@@ -95,13 +64,13 @@ $conn->close();
         <button id="reiniciar" onclick="window.location.href='index.php'">Reiniciar juego</button>
     </div>
     <h1>Top 5 Jugadores</h1>
-<table id="jugadores">
+<table id="puntajes">
 	<thead>
 		<tr>
-      <?= $tabla_clasificacion ?>
+			<th>Nombre</th>
+			<th>Puntuación</th>
 		</tr>
 	</thead>
-
 </table>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -301,18 +270,27 @@ function announceWinner(winner, direction) {
   const player2p = document.getElementById('jugador2p');
   //const j1 = document.getElementById('j1');
   const empates = document.getElementById('empates');
+  let winnerName = '';
+  let loserName = '';
+  let winnerScore = 0;
+  let loserScore = 0;
     if (winner === 'X') {
         alert(`${player1} ganó la partida!`);
         j1.textContent = `Puntuación ${player1}:`
         j2.textContent = `Puntuación ${player2}:`
         player1p.textContent = `${++player1Wins}`;
+        winner = player1;
     } else {
         alert(`${player2} ganó la partida!`);
         j1.textContent = `Puntuación ${player1}:`
         j2.textContent = `Puntuación ${player2}:`
         player2p.textContent = `${++player2Wins}`;
+        winner = player2;
     }
       gameOver = true;
+      let playerName = winner === 'X' ? player1 : player2;
+      let playerScore = winner === 'X' ? player1Wins : player2Wins;
+      saveScore(playerName, playerScore);
 }
   //para mostrar u ocultar la tabla de puntos
 btnTabla.addEventListener("click", function() {
@@ -326,18 +304,36 @@ btnTabla.addEventListener("click", function() {
         btnTabla.textContent = 'Puntuaciones';
     }
 });
-function guardarPuntuacion() {
-  const nombre1 = document.getElementById('player1').value;
-  const nombre2 = document.getElementById('player2').value;
-  const puntuacion1 = player1Wins;
-  const puntuacion2 = player2Wins;
-  $.ajax("index.php", { nombre: nombre1, puntaje: puntuacion1 }, function() {
-    console.log('Puntuación del jugador 1 guardada con éxito');
+function saveScore(playerName, score) {
+  $.ajax({
+    type: 'POST',
+    url: 'save_score.php',
+    data: {
+      'playerName': playerName,
+      'score': score
+    },
+    success: function(response) {
+      updateTop5();
+    }
   });
-  $.ajax("index.php", { nombre: nombre2, puntaje: puntuacion2 }, function() {
-    console.log('Puntuación del jugador 2 guardada con éxito');
-    location.reload();
-  }); 
-}</script>
+}
+function updateTop5() {
+  $.ajax({
+    type: 'GET',
+    url: 'get_top5.php',
+    success: function(response) {
+      $('#puntajes').html(response);
+    }
+  });
+  /*$(document).ready(function() {
+            $.getJSON('puntajes_json.php', function(data) {
+                $.each(data, function(index, item) {
+                    $('#puntajes').append('<tr><td>' + item.nombre + '</td><td>' + item.puntaje + '</td></tr>');
+                });
+            });
+        });*/
+}
+
+    </script>
 </body>
 </html>
