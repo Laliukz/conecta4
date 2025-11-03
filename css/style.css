@@ -1,0 +1,260 @@
+
+body{
+  margin:0;
+  font-family: var(--bs-font-sans-serif);
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  background-image: linear-gradient(0deg, rgba(75, 100, 139, 0.86) 0%, rgba(152, 223, 214, 1) 100%);
+}
+
+
+h1 {
+  font-size: 48px;
+  text-align: center;
+  color: #000;
+  text-shadow: #FFFCA8 2px 2px 0px, #9C9C9C 4px 4px 0px;
+}
+
+
+#gameset {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #00235B;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0;
+  justify-self: start;
+  align-self: start;
+  width: 250px;
+  height: auto;
+  text-align: center;
+  -webkit-box-shadow: 0px 0px 11px -2px #000000;
+  box-shadow: 0px 0px 11px -2px #000000;
+}
+
+/* Contenedor principal */
+#main{
+  display: grid;
+  grid-template-columns: 300px 1fr 300px;
+  gap: 60px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  align-items: start;
+}
+
+
+#canvas{
+  justify-self: center;
+}
+
+
+#scorepanel{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: rgba(0,0,0,0.03);
+  padding: 12px;
+  border-radius: 8px;
+  min-height: 120px;
+}
+
+/* Responsividad */
+@media (max-width: 900px) {
+  #main{
+    grid-template-columns: 1fr;
+    width: 95%;
+    gap: 12px;
+    padding: 8px;
+  }
+  #gameset, #scorepanel, #actj {
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    justify-self: center;
+    align-self: center;
+  }
+  #botonesf{
+    width: auto;
+  }
+  #canvas{
+    width: 90vw;
+    height: auto;
+    justify-self: center;
+  }
+}
+
+/* Móvil: ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  h1 { font-size: 28px; }
+  #gameset { padding: 12px; max-width: 320px; width: 90%; }
+  #player1, #player2 { width: 100%; }
+  #size { width: 50%; }
+  #botonesf { gap: 6px; padding: 6px; }
+  #gameset, #scorepanel, #actj { -webkit-box-shadow: none; box-shadow: none; }
+  #gameset, #scorepanel, #actj { justify-self: center; align-self: center; margin: 0 auto; }
+  table { font-size: 14px; }
+}
+
+label { 
+  font-weight: bold; 
+  color: #ffffff; 
+  margin-bottom: 10px; 
+}
+
+#size{ 
+  margin-bottom: 10px; 
+  width: 25%; padding: 8px; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+}
+
+#player1, #player2{ 
+  margin-bottom: 10px; 
+  width: 50%; 
+  padding: 8px; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+}
+
+#iniciarj{ 
+  background-color: #E21818; 
+  font-weight: bold; 
+  color: rgb(255,255,255); 
+  padding: 3% 3%; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+}
+
+#iniciarj:hover{ 
+  background-color: #FFDD83; 
+  color: #000; 
+}
+
+#canvas { 
+  background-color: #ffffff98; 
+  width: auto; 
+  height: auto; 
+  margin-bottom: 10px; 
+  display: block; 
+  margin: auto; 
+  border: 2px solid #000000; 
+  border-radius: 10px; 
+  -webkit-box-shadow: 0px 0px 11px 4px #000000; 
+  box-shadow: 0px 0px 11px 4px #000000; 
+}
+
+#actj{
+  display: flex; 
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
+  background-color: #00235B; 
+  color: #ffffff; 
+  border: 1px solid #000000; 
+  border-radius: 10px; 
+  padding: 2% 1%; 
+  margin: 0 auto; 
+  justify-self: center; 
+  align-self: center; 
+  width: 15%; 
+  height: auto; 
+  text-align: center; 
+  -webkit-box-shadow: 0px 0px 11px -2px #000000; 
+  box-shadow: 0px 0px 11px -2px #000000; 
+}
+
+#player, #jug { 
+  font-weight: bold; 
+  text-align: justify; 
+  font-size: 20px; 
+}
+
+#botonesf{ 
+  display: flex; 
+  flex-direction:row; 
+  justify-content: center; 
+  align-items: center; 
+  background-color: #ffffff00; 
+  border: 1px solid #ffffff00; 
+  padding: 2% 2%; 
+  margin: auto; 
+  width: 70%; 
+  height: auto; 
+  gap: 10px; 
+}
+
+#restartButton, #reiniciar{ 
+  background-color: #E21818; 
+  color: white; 
+  padding: 3% 6%; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  -webkit-box-shadow: 0px 0px 11px -2px #000000; 
+  box-shadow: 0px 0px 11px -2px #000000; 
+}
+
+#btnTabla{ 
+  display: flex; 
+  background-color: #E21818; 
+  color: white; 
+  padding: 1% 1%; 
+  border: none; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  -webkit-box-shadow: 0px 0px 11px -2px #000000; 
+  box-shadow: 0px 0px 11px -2px #000000; 
+}
+
+#restartButton:hover, #reiniciar:hover, #btnTabla:hover{ 
+  background-color: #FFDD83; 
+  color: #000; 
+}
+
+table { 
+  display: table; 
+  border-collapse: collapse; 
+  width: 100%; 
+  margin: 8px 0 0 0; 
+  border-radius: 6px; 
+  overflow: hidden; 
+}
+
+th{ 
+  background: rgba(0,0,0,0.15); 
+  color: #ffffff; 
+  text-align: left; 
+  padding: 8px; 
+  font-weight: bold; 
+}
+
+td { 
+  border: 1px solid #ddd; 
+  padding: 8px; 
+  text-align: left; 
+  font-weight: bold; 
+  color: #ffffff; 
+}
+
+tr { 
+  background-color: #0011ff5d; 
+}
+
+/* Puntuaciones */
+#jugador1p, #jugador2p, #empates { 
+  font-weight: bold; 
+  text-align: justify; 
+  font-size: 20px; 
+  color: #ffffff; 
+}
+
